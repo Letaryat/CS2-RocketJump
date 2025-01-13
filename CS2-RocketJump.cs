@@ -8,14 +8,13 @@ public class cs2_rocketjump : BasePlugin
 {
     public override string ModuleName => "CS2-Rocketjump";
 
-    public override string ModuleVersion => "0.0.1";
+    public override string ModuleVersion => "0.0.2";
 
     public override string ModuleAuthor => "Letaryat";
     public override string ModuleDescription => "Rocket jump yipee!";
     public override void Load(bool hotReload)
     {
         Console.WriteLine("CS2-Rocket Jump on!");
-        RegisterEventHandler<EventWeaponFire>(OnWeaponFire);
         RegisterEventHandler<EventPlayerHurt>(OnPlayerHurt);
         RegisterEventHandler<EventBulletImpact>(OnBulletImpact);
     }
@@ -24,38 +23,6 @@ public class cs2_rocketjump : BasePlugin
         Console.WriteLine("CS2-Rocket Jump off!");
     }
 
-    public HookResult OnWeaponFire(EventWeaponFire @event, GameEventInfo info)
-    {
-        /*
-        old stuff that I tried to make a possible rocketjump before any maths, now useless i think
-
-        var player = @event.Userid;
-        var playerPawn = player!.PlayerPawn.Value;
-        var playerWeapon = playerPawn!.WeaponServices!.ActiveWeapon.Value;
-        CBasePlayerWeapon weapon = playerWeapon!;
-        CCSWeaponBase _weapon = weapon.As<CCSWeaponBase>();
-        _weapon.VData!.ZoomLevels = 0;
-        _weapon.VData.Penetration = 0;
-        var recoil = _weapon.VData!.RecoilMagnitude.Values[0];
-        Server.PrintToChatAll($"Strzal z: {recoil}");
-
-        /*  This part is yoinked: */
-        /*
-        var eyeAngle = player!.PlayerPawn!.Value!.EyeAngles;
-        var pitch = Math.PI / 180 * eyeAngle.X;
-        var yaw = Math.PI / 180 * eyeAngle.Y;
-        var eyeVector = new Vector((float)(Math.Cos(yaw) * Math.Cos(pitch)), (float)(Math.Sin(yaw) * Math.Cos(pitch)), (float)-Math.Sin(pitch));
-        /* ---------------------- */
-        /*
-        var PunchVel = playerPawn!.AimPunchAngleVel;
-        if (eyeVector.Z < -0.85)
-        {
-            player.PlayerPawn.Value.AbsVelocity.Z = recoil * 10;
-
-        }
-        */
-        return HookResult.Continue;
-    }
     public HookResult OnPlayerHurt(EventPlayerHurt @event, GameEventInfo info)
     {
         var attacker = @event.Attacker;
@@ -94,25 +61,6 @@ public class cs2_rocketjump : BasePlugin
             Y = normalizedDirection.Y,
             Z = normalizedDirection.Z
         };
-    }
-    //Old method that i was trying to get to work before "actual" rocket jumping
-    public float CalculateDistance(float playerpos, float bulletpos, float recoil)
-    {
-        var distance = Math.Abs(playerpos - bulletpos);
-        var percentage = Math.Round(distance / recoil * 100);
-        Server.PrintToChatAll($"Percentage: {percentage}");
-        if (distance > 150)
-        {
-            return 0;
-        }
-        else if (distance == 0)
-        {
-            return recoil;
-        }
-        else
-        {
-            return Math.Abs(recoil - distance);
-        }
     }
 
     public HookResult OnBulletImpact(EventBulletImpact @event, GameEventInfo info)
