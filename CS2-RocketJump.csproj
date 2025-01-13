@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+	<ItemGroup>
+		<Reference Include="CounterStrikeSharp.API" Version="1.0.284">
+			<HintPath>../libs/CounterStrikeSharp.API.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+</Project>
