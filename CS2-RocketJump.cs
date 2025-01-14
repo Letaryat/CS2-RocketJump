@@ -8,7 +8,7 @@ public class cs2_rocketjump : BasePlugin
 {
     public override string ModuleName => "CS2-Rocketjump";
 
-    public override string ModuleVersion => "0.0.3";
+    public override string ModuleVersion => "0.0.4";
 
     public override string ModuleAuthor => "Letaryat";
     public override string ModuleDescription => "Rocket jump yipee!";
@@ -63,6 +63,17 @@ public class cs2_rocketjump : BasePlugin
         };
     }
 
+    public Vector CalculateDistance(Vector playerPos, Vector bulletPos)
+    {
+        var distance = new Vector
+        {
+            X = playerPos.X - bulletPos.X,
+            Y = playerPos.Y - bulletPos.Y,
+            Z = playerPos.Z - bulletPos.Z
+        };
+        return distance;
+    }
+
     public HookResult OnBulletImpact(EventBulletImpact @event, GameEventInfo info)
     {
         var player = @event.Userid;
@@ -70,6 +81,17 @@ public class cs2_rocketjump : BasePlugin
 
         var playerPawn = player!.PlayerPawn.Value;
         var bullet = @event;
+
+        var bulletPos = new Vector
+        {
+            X = bullet.X,
+            Y = bullet.Y,
+            Z = bullet.Z
+        };
+
+        var distance = CalculateDistance(playerPawn!.AbsOrigin!, bulletPos);
+
+        if(distance.Z >= 300) return HookResult.Continue;
 
         /*  This part is yoinked: https://github.com/edgegamers/Jailbreak/blob/main/mod/Jailbreak.Warden/Paint/WardenPaintBehavior.cs#L131 */
 
@@ -81,29 +103,30 @@ public class cs2_rocketjump : BasePlugin
         if (eyeVector.Z < -0.85)
         {
             var playerWeapon = playerPawn!.WeaponServices!.ActiveWeapon.Value;
-            var bulletPos = new Vector
-            {
-                X = bullet.X,
-                Y = bullet.Y,
-                Z = bullet.Z
-            };
             CBasePlayerWeapon weapon = playerWeapon!;
             CCSWeaponBase _weapon = weapon.As<CCSWeaponBase>();
             /* dumb stuff that i was playing with */
-            _weapon.VData!.ZoomLevels = 0;
-            _weapon.VData.Penetration = 0;
-            _weapon.VData.InaccuracyJump.Values[0] = 0;
+            //_weapon.VData!.ZoomLevels = 0;
+            //_weapon.VData.Penetration = 0;
+            _weapon.VData!.InaccuracyJump.Values[0] = 0;
             _weapon.VData.InaccuracyJump.Values[1] = 0;
-            _weapon.VData.IsFullAuto = true;
+            //_weapon.VData.IsFullAuto = true;
             /* */
+
             var recoil = _weapon.VData!.RecoilMagnitude.Values[0];
             Vector knockback = CalculateRJ(playerPawn.AbsOrigin!, bulletPos, recoil);
+
+            /* exkludera particles */
+
             var particle = Utilities.CreateEntityByName<CParticleSystem>("info_particle_system")!;
             particle.EffectName = "particles/explosions_fx/explosion_basic.vpcf";
             particle.DispatchSpawn();
             particle.AcceptInput("Start");
 
             particle.Teleport(bulletPos);
+
+            /*                          */
+
             player.PlayerPawn.Value.AbsVelocity.X += knockback.X * (recoil * 10);
             player.PlayerPawn.Value.AbsVelocity.Y += knockback.Y * (recoil * 10);
             player.PlayerPawn.Value.AbsVelocity.Z += knockback.Z * (recoil * 10);
