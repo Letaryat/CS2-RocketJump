@@ -125,7 +125,8 @@ public class cs2_rocketjump : BasePlugin
 
             particle.Teleport(bulletPos);
 
-            /*                          */
+            /* ---------------------- */
+            
             player.PlayerPawn.Value.AbsVelocity.X += knockback.X * (recoil * 10);
             player.PlayerPawn.Value.AbsVelocity.Y += knockback.Y * (recoil * 10);
             player.PlayerPawn.Value.AbsVelocity.Z += knockback.Z * (recoil * 10);
